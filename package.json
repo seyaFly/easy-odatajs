@@ -1,0 +1,22 @@
+{
+  "name": "easy-odatajs",
+  "version": "1.0.0",
+  "description": "easy to generate the odata URLs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seyaFly/easy-odatajs.git"
+  },
+  "keywords": [
+    "odata"
+  ],
+  "author": "Cai, Chen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/seyaFly/easy-odatajs/issues"
+  },
+  "homepage": "https://github.com/seyaFly/easy-odatajs#readme"
+}
