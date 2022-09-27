@@ -1,10 +1,32 @@
-const { isEmpty, isObject}  = require("../utils/util")
+const { isString, isAllowedOperater}  = require("../utils/util");
+/**
+ *  
+ * @param { string } operator  "GE", "LE", "GT", "LT"
+ * @param { any } value   the value which after  the operator 
+ */
+function Option(operator, value){
+    if(isAllowedOperater(operator)){
+        this.operator = operator;
+        this.value = value;
+    }
+}
 
-function SelectOption(sign,operator, lower, higher, ){
-    this.sign = sign;
-    this.operator = operator;
-    this.lower = lower;
-    this.higher = higher;
+/**
+ * 
+ * @param { Option } low 
+ * @param { Option } high 
+ */
+function SelectOption(low, high){
+
+    if(low instanceof Option && high instanceof Option)
+
+    if(low && !high){
+        this.low = low;
+    }
+
+    if(!low && high){
+        this.high = high
+    }
 }
 
 /**
@@ -12,26 +34,32 @@ function SelectOption(sign,operator, lower, higher, ){
  * @param {*} key  field name 
  * @param {object} options 
  * 
- * e.g : {"customerId":{"sign":"","operator":"ne","lowner":"","higher":""}}
- * 
- * or  {"customerId":{operator":"ne"}}
- * 
  */
+function filterOption(){
+    this.data = {}; 
+}
 
-function filterOption(key , options){
-    this.key = key
+/**
+ * 获取filterOption数据
+ */
+filterOption.prototype.getData= function(){
+    return this.data;
+}
 
-    if(options && isObject(options)){
-        /**
-         * sign : I <include> , E exclude
-         * operator: le , ge , gt , lt 
-         */
-        if(options.sign && options.operator && (options.lower || options.higher)){
-            this.options = options
-        }else{
-            this.operator = options.operator
+filterOption.prototype.addOperation = function(key, option){
+    if(option && option instanceof SelectOption ){
+
+        if(option.low || option.high){
+            this.data[key] = option
+        }
+    }
+
+    if(option && isString(option)){
+
+        if(isAllowedOperater(option)){
+            this.data[key] =  option.toLowerCase();
         }
     }
 }
 
-module.exports = filterOption
+module.exports = { filterOption, SelectOption, Option }

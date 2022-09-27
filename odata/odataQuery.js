@@ -1,5 +1,7 @@
 const { SUCCESS, ERROR, WARNING, INFO } = require('../utils/MessageType')
-const { isArray, isBoolean, isEmpty, isObject, trimEnd } = require("../utils/util")
+const { isArray, isBoolean, isEmpty, isObject, trimEnd, isString, isAllowedOperater } = require("../utils/util");
+const { EQUAL } = require("../utils/Operator");
+
 
 /**
  * @class ODataQuery
@@ -47,18 +49,10 @@ ODataQuery.prototype._or = function() {
 };
 
 /**
- * filter ne 
- */
-ODataQuery.prototype._ne = function(value) {
-    this.odataQueryURL = `${this.odataQueryURL} ne ${value}`;
-    return this;
-};
-
-/**
  * 
  * add filters
  */
-ODataQuery.prototype._filter = () => {
+ODataQuery.prototype._filter = function(){
     this.odataQueryURL = `${this.odataQueryURL}&$filter=`;
     return this;
 };
@@ -66,10 +60,49 @@ ODataQuery.prototype._filter = () => {
 /**
  * add field
  */
-ODataQuery.prototype._field = (field) => {
+ODataQuery.prototype._field =  function(field){ 
     this.odataQueryURL = `${this.odataQueryURL}${field}`;
     return this;
 };
+
+/**
+ * 
+ * @param {*} field  field name
+ * @param {*} values values
+ */
+ODataQuery.prototype._fieldOr = function(field, values){
+
+    // if (values.length === 1) {
+    //     this.field
+    //     this.field(key).eqString(values[0]);
+    // } else {
+    //     map(values, (value, index) => {
+    //         if (index === 0) {
+    //             this.openParenthesis().field(key).eqString(value);
+    //         } else if (index === values.length - 1) {
+    //             this.or().field(key).eqString(value).closeParenthesis();
+    //         } else {
+    //             this.or().field(key).eqString(value);
+    //         }
+    //     })
+    // }
+
+    if(values.length === 1){
+        this._field(key)._addFilter(EQUAL, values[0]);
+    }else{
+        for( var i in values){
+            if (i === 0) {
+                this._openParenthesis()._field(key)._addFilter(EQUAL, values[i]);
+            } else if (index === values.length - 1) {
+                this._or()._field(key)._addFilter(EQUAL, values[i])._closeParenthesis();
+            } else {
+                this._or()._field(key)._addFilter(EQUAL, values[i]);
+            }          
+        }
+    }
+
+    return this;
+}
 
 /**
  * add odataQueryRUL ( 
@@ -88,53 +121,53 @@ ODataQuery.prototype._closeParenthesis = function(){
 };
 
 /**
- * Operation eq
+ * 
+ * @param {*} operator  GE, LE, LT, GT, NE
+ * @param {*} value  the value after the operater
+ * @returns 
  */
-ODataQuery.prototype._eqString = function(value) {
-    if(isBoolean(value)){
-        this.odataQueryURL = `${this.odataQueryURL} eq ${value}`;
-    }else{
-        this.odataQueryURL = `${this.odataQueryURL} eq '${value}'`;
-    }
-    return this;
-};
+ODataQuery.prototype._addFilter = function(operator, value){
 
-ODataQuery.prototype._gtString =  function(value) {
-    if(value.includes("datetime")){
-        this.odataQueryURL = `${this.uodataQueryURLrl} gt ${value}`;
+    if(value.includes("datetime") || isBoolean(value)){
+        this.odataQueryURL = `${this.odataQueryURL} ${operator} ${value}`;
     }else{
-        this.odataQueryURL = `${this.odataQueryURL} gt '${value}'`;
+        this.odataQueryURL = `${this.odataQueryURL} ${operator} '${value}'`;
     }
 
     return this;
-};
+}
 
-ODataQuery.prototype._ltString =  function(value) {
-    if(value.includes("datetime")){
-        this.odataQueryURL = `${this.odataQueryURL} lt ${value}`;
-    }else{
-        this.odataQueryURL = `${this.odataQueryURL} lt '${value}'`;
-    }
-
+ODataQuery.prototype._between = function(key, low, high){
     return this;
-};
+}
 
-ODataQuery.prototype._geString =  function(value) {
-    if(value.includes("datetime")){
-        this.odataQueryURL = `${this.odataQueryURL} ge ${value}`;
-    }else{
-        this.odataQueryURL = `${this.odataQueryURL} ge '${value}'`;
-    }
-   
-    return this;
-};
-ODataQuery.prototype._leString =  function(value) {
 
-    if(value.includes("datetime")){
-        this.odataQueryURL = `${this.odataQueryURL} le ${value}`;
-    }else{
-        this.odataQueryURL = `${this.odataQueryURL} le '${value}'`;
-    }
+/**
+ * 
+ * @param {*} count  
+ * @param {*} filter 
+ * @param {*} filterOption 
+ * @param {*} pagination 
+ * @param {*} serach 
+ * @param {*} format 
+ * @param {*} lang 
+ * @returns 
+ */
+ODataQuery.prototype.getQuery = function(count, filter, filterOption, pagination, serach, format, lang ){
+
+    if(count){ this.count(count); };
+
+    if(filter && filterOption){ this.filters(filter, filterOption); }
+
+    if(pagination){ this.pagination(pagination); }
+
+    if(serach){ this.search(serach); }
+
+    if(orderby){ this.orderby(orderby); }
+
+    if(format){ format === "json" ?this.jsonFormat() : this.xmlFormat(); }
+
+    if(lang){ this.sapLang(lang); };
     
     return this;
 };
@@ -159,12 +192,41 @@ ODataQuery.prototype._leString =  function(value) {
       }
   }
 
-  ODataQuery.prototype.filters = function(filters){
-    if(!isEmpty(filters)){
-        this._filter();
-        let values = Object.assign(filters);
+/**
+ * 
+ * @param {*} filter 
+ * @param {*} filterOption 
+ * @returns 
+ */
+ODataQuery.prototype.filters = function(filter, filterOption){
+  if(!isEmpty(filter)){
+    this._filter();
+
+    for( const key in filter){
+       if(filterOption[key]){
+            let option = filterOption[key];
+
+            if(option.low && option.high){
+                this._between(key, option.low, option.high)._and();
+            }else{
+                if(isString(option) && isAllowedOperater(option)){
+                    this._field(key)._addFilter(option.toLowerCase(), filter[key])._and();
+                }
+            }
+       }else{
+          if( isArray(filter[key])){
+            this._fieldOr(key, filter[key])._and();
+          }else{
+            this._field(key)._addFilter(EQUAL, filter[key])._and();
+          }
+          
+       }    
     }
+
+    this.getOdataQueryURL = trimEnd(this.getOdataQueryURL, ' and ');
   }
+  return this;
+}
 
 /**
  * get odata query URL
@@ -181,8 +243,6 @@ ODataQuery.prototype.getOdataQueryURL = function(){
 ODataQuery.prototype.getOdataBatchURL = function(){
     return this.odataBatchURL;
 }
-
-
 
 /**
  * format as JSON and return the numbers in all pages

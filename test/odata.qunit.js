@@ -1,10 +1,12 @@
 const { test } = require("qunit");
-const { ODataQuery, OdataBatch }  = require("../index")
+const { ODataQuery, OdataBatch, Option, SelectOption, filterOption }  = require("../index")
+
 
 /**
  * {@link https://odata.org}.
  * {@link https://services.odata.org/V2/Northwind/Northwind.svc}.
  */
+
 QUnit.module('Odata Query Operation with odata version 2.0', hooks =>{
 
     var testOdataServiceURL = "https://services.odata.org/V2/Northwind/Northwind.svc";
@@ -90,6 +92,23 @@ QUnit.module('Odata Query Operation with odata version 2.0', hooks =>{
         'https://services.odata.org/V2/Northwind/Northwind.svc/$batch');
     });
 });
+
+// QUnit.module('Odata Query Operation with fitlers', hooks =>{
+
+//     var testOdataServiceURL = "https://services.odata.org/V2/Northwind/Northwind.svc";
+//     var entity = "Customers";
+
+//     var testRequest = {
+
+//     }
+
+//     test('test odata fitler Options', assert => {
+//         let option = new Option( "GE", "100");
+
+//         console.log(option)
+//     });
+// })
+
 
 QUnit.module('Odata Query Operation with sap Usage', hooks =>{
     var testOdataServiceURL = "https://myNNNNNN.crm.ondemand.com/sap/c4c/odata/v1/odataservicecatalog";
