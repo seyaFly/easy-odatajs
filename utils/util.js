@@ -15,9 +15,23 @@ const isArray = (value) => {
  * @returns return the true/false if the type of value is boolean
  */
 const isBoolean =(value) => {
-    return (typeof value === 'boolean')? true : false
+    return (typeof value === 'boolean')? true : false;
 }
 
+/**
+ * 
+ * @param {*} value 
+ * @returns return the true/false if the type of value is number
+ */
+const isNumber = (value) =>{
+    return (typeof value === "number")? true : false;
+}
+
+/**
+ * 
+ * @param {*} value 
+ * @returns return the true/false if the type of value is string
+ */
 const isString = (value) =>{
     return (typeof value === 'string')? true : false
 }
@@ -74,4 +88,4 @@ const trimEnd = (value, chars) => {
     return isAllowed;
 }
 
-module.exports = { isArray, isBoolean, isEmpty, isObject, trimEnd, isString, isAllowedOperater }
+module.exports = { isArray, isBoolean, isEmpty, isObject, trimEnd, isString, isAllowedOperater, isNumber }
