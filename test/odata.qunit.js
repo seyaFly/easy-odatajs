@@ -74,13 +74,13 @@ QUnit.module('Odata Query Operation with odata version 2.0', hooks =>{
         "filterOption" : {
             "PostalCode" : {
               "low"  : { "operator" : "ge", "value": "100" },
-              "high" : { "operator" : "le", "value": "100" }
+              "high" : { "operator" : "le", "value": "102" }
             }
         }
       }
 
       assert.equal(odataQuery2.createQuery(query2).getOdataQueryURL(), 
-      "https://services.odata.org/V2/Northwind/Northwind.svc/Customers?$filter=Country eq 'Germany' and (PostalCode ge '100' and PostalCode le '100')")
+      "https://services.odata.org/V2/Northwind/Northwind.svc/Customers?$filter=Country eq 'Germany' and (PostalCode ge '100' and PostalCode le '102')")
 
   })
 
