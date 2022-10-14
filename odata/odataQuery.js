@@ -16,8 +16,9 @@ function ODataQuery(odataServiceURL, entity) {
 
   if(entity){
     this.entityName = entity;
-    this._setOdataQueryURL();
   }
+
+  this._setOdataQueryURL();
 }
 
 /**
@@ -25,10 +26,15 @@ function ODataQuery(odataServiceURL, entity) {
  */
 ODataQuery.prototype._setOdataQueryURL = function(){
   if(this.odataService){
-     this.odataQueryURL = `${this.odataService}/${this.entityName}`;
+     if(this.entityName){
+      this.odataQueryURL = `${this.odataService}/${this.entityName}`;
+     }else{
+      this.odataQueryURL = `${this.odataService}`;
+     }
+     
      this._setMessage(SUCCESS, "odata service URL for query is updated")
   }else{
-    this._setMessage(ERROR, "odata servcie url is empty")
+     this._setMessage(ERROR, "odata servcie url is empty")
   }
 }
 
@@ -145,46 +151,6 @@ ODataQuery.prototype._between = function(key, low, high){
   return this;
 }
 
-
-/**
- * 
- * @param {*} filter 
- * {
- *   "Country" : "Germany"
- *   "City": "Berlin",
- * }
- * @param {*} filterOption
- * 
- * example
- * {
- *   "City" : "ne"
- * } 
- * @param {*} pagination
- * 
- * example
- * {
- *  current : 1,
- *  pageSize : 30
- * }
- * @param {*} serach 
- *  
- * @param {*} orderby
- * example :
- *  {
- *  "Country" : "asc",
- *  "CustomerID" : "desc"
- *  }
- * 
- * @param select 
- * 
- * ["CustomerID", "CompanyName","CompanyName"]
- * 
- * @param {*} format 
- * json / xml
- * @param {*} lang 
- * zh , en , de...
- * @returns 
- */
 ODataQuery.prototype.createQuery = function(query){
   if(!isObject(query)){
     this.message.type = ERROR;

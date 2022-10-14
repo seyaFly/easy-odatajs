@@ -5,7 +5,7 @@ Install it
 
 ``` npm i easy-odatajs ```
 
-### How To Use
+### How To Use to genreate the odata service URL
 
 create an query object which simplify the odata query.
 
@@ -14,7 +14,7 @@ query template:
 `<value>` ：     normally is string value, can be null
 `<fieldName>` :  the field name you want to select 
 `<Integer>`:     integer value
-`<operator>`:    here is the allowed operater `ge`,`le`,`gt`,`lt`,`lt`,`ne`
+`<operator>`:    here is the allowed operater `ge`,`le`,`gt`,`lt`,`lt`,`ne`, `eq`
 `<format>` :     format value can be `json`, `xml`
 `<sortOption>` : sortOption can be `asc`, `desc` 
 
@@ -75,3 +75,5 @@ here is odata query example, and here is the [How to use](test/odata.qunit.js)
   "format" : "json"
 }
 ```
+### How To Use to genreate the odata batch body
+

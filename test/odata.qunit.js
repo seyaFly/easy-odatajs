@@ -1,5 +1,5 @@
 const { test } = require("qunit");
-const { ODataQuery, OdataBatch, Option, SelectOption, filterOption }  = require("../index")
+const { ODataQuery }  = require("../index")
 
 
 /**

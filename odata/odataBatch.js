@@ -14,11 +14,27 @@ function OdataBatch(){
    this.batchHeader = "HTTP/1.1\r\nAccept: application/json\r\ncontent-Type: application/json\r\nContent-Length: 100000";
 };
 
+OdataBatch.prototype.getHeaderInfo = function(){
+    let getHeaderInfo = {
+        key : "content-Type",
+        value: this.header.substring(14)
+    }
+
+    return {
+        key : "content-Type",
+        value: this.header.substring(14)
+    };
+}
+
+OdataBatch.prototype.getBatchData = function(){
+    return this.batchData;
+}
+
 /**
  * 
  */
 
-OdataBatch.prototype.begin = () => {
+OdataBatch.prototype._begin = function(){
     this.batchData = `${this.batch_guid_separator}\r\n${this.header}\r\n\r\n${this.batchData}`;
     return this;
 };
@@ -29,16 +45,16 @@ OdataBatch.prototype.begin = () => {
  * @returns { object } batch data
  * 
  */
-OdataBatch.prototype.batchRequest = (aRequest) =>{
+OdataBatch.prototype._batchRequest = function(aRequest){
     if(isArray(aRequest)){
         if(aRequest.length !== 0){
           aRequest.forEach( (element)=>{
               if(element.method === HTTP_PATCH){
-                  this.patchPayload(element.C4Object, element.request)
+                  this._patchPayload(element.entity, element.request)
               }else if(element.method === HTTP_POST){
-                  this.postPayload(element.C4Object, element.request)
+                  this._postPayload(element.entity, element.request)
               }else if(element.method === HTTP_DELETE){
-                  this.deletePayload(element.C4Object)
+                  this._deletePayload(element.entity)
               }
           })
         }
@@ -63,7 +79,7 @@ OdataBatch.prototype.batchRequest = (aRequest) =>{
 *     "Finish" : "Z02"
 * }
 */
-OdataBatch.prototype.patchPayload=(value, req)=>{
+OdataBatch.prototype._patchPayload= function(value, req){
     let reqString = JSON.stringify(req);
     this.batchData = `${this.batchData}${this.changeset}\r\n${this.changesetHeader}\r\n\r\n${HTTP_PATCH} ${value} ${this.batchHeader}\r\n\r\n${reqString}\r\n\r\n`
     return this;
@@ -81,7 +97,7 @@ OdataBatch.prototype.patchPayload=(value, req)=>{
  *    "ProductID": "10000760"
  * }
  */
- OdataBatch.prototype.postPayload=(value, req)=>{
+ OdataBatch.prototype._postPayload=function(value, req){
     let reqString = JSON.stringify(req);
     this.batchData = `${this.batchData}${this.changeset}\r\n${this.changesetHeader}\r\n\r\n${HTTP_POST} ${value} ${this.batchHeader}\r\n\r\n${reqString}\r\n\r\n`
     return this;
@@ -95,7 +111,7 @@ OdataBatch.prototype.patchPayload=(value, req)=>{
  * Content-Length: 10000
  *
  */
-OdataBatch.prototype.deletePayload=(value)=>{
+OdataBatch.prototype._deletePayload=function(value){
     this.batchData = `${this.batchData}${this.changeset}\r\n${this.changesetHeader}\r\n\r\n${HTTP_DELETE} ${value} ${this.batchHeader}\r\n\r\n\r\n\r\n`
     return this;
 };
@@ -105,9 +121,13 @@ OdataBatch.prototype.deletePayload=(value)=>{
  * --changeset_guid_gld-- 
  * --batch_guid_gld--
  */
-OdataBatch.prototype.end = ()=>{
+OdataBatch.prototype._end = function(){
     this.batchData = `${this.batchData}${this.changeset}-- \r\n${this.batch_guid_separator}--\r\n`;
     return this;
 };
 
-module.exports = OdataBatch
+OdataBatch.prototype.createBatchData = function(aRequest){
+    return this._begin()._batchRequest(aRequest)._end();
+}
+
+module.exports = OdataBatch 
