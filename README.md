@@ -5,7 +5,7 @@ Install it
 
 ``` npm i easy-odatajs ```
 
-### How To Use to genreate the odata service URL
+### How to genreate the odata service URL
 
 create an query object which simplify the odata query.
 
@@ -75,5 +75,98 @@ here is odata query example, and here is the [How to use](test/odata.qunit.js)
   "format" : "json"
 }
 ```
-### How To Use to genreate the odata batch body
+
+Example Code : 
+```javascript
+  
+  //initialize the odate service URL
+  let testOdataServiceURL = "https://services.odata.org/V2/Northwind/Northwind.svc";
+  let entity = "Customers";
+  let odataQuery = new ODataQuery(testOdataServiceURL, entity);
+
+  //prepreate the query infoimation base on the template request
+  let query = {
+    "filter" : { 
+      "Country" : "Germany",
+      "City": "Berlin" 
+    }
+    ...
+  }
+
+  //get odata query URL
+  let odataQueryURL = odataQuery.createQuery(query).getOdataQueryURL();
+  ...
+  //user the ajax or other javascript library to get the corresponding response from odata request
+  ..
+
+```
+
+### How to genreate the odata batch body
+
+if we want to create mutiple enitites or update multiple entities in one time , we could use odata batch functionanlites
+
+here the steps to genter the odata batch :
+
+batch request Template :
+
+`<method>` : http method , can be `POST`,  `PATCH`, `DELETE`
+`<entity>` : entity name
+`<request>`: the request which create new entity or update entity,  if method is `DELETE`, the request can be null
+
+
+```json
+{
+  "method" : "<method>",
+  "entity" : "<entity>",
+  "request": "<request>"
+}
+```
+
+Example Code
+
+```javascript
+
+//prepre the correspoding request
+
+let odataBatch = new OdataBatch();
+
+//get headerinfo and add header to request
+let header  = odataBatch.getHeaderInfo();
+
+//prepare the batch request base on the reuqest
+
+  let postRequest = {
+      method : "POST",
+      entity : "Customers",
+      request : {
+          "CompanyName" : "Wolfgong",
+          "ContactName" : "Smith"
+      }
+  }
+  let patchRequest = {
+      method : "PATCH",
+      entity : "Customers('ALFKI')",
+      request : {
+          "CompanyName" : "Name1",
+          "ContactName" : "Name2"
+      }
+  }
+  
+  let deleteRequest = {
+      method : "DELETE",
+      entity : "Customers('ALFKI')",
+  }
+
+let aBatchRequest = []
+aBatchRequest.push(postRequest, patchRequest, deleteRequest); // add the corresponding request 
+
+//creat the batch data for the request body
+let odataBatch = new OdataBatch();
+let batchData = odataBatch.createBatchData(aBatchRequest).getBatchData();
+
+//set the header and body and set the request to do the create / update / delete operations 
+...
+
+```
+
 

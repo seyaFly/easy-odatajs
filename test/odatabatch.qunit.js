@@ -13,7 +13,6 @@ QUnit.module('Odata Batch releated test', hooks =>{
 
     test("test odata Batch generate batch header info", assert => {
         let odataBatch = new OdataBatch();
-        console.log(odataBatch.getHeaderInfo());
         assert.true(odataBatch.getHeaderInfo().value.includes("multipart/mixed; boundary=changeset_guid_"), "ok with header value")
     })
 
@@ -28,7 +27,6 @@ QUnit.module('Odata Batch releated test', hooks =>{
         }
 
         let patchRequest = {
-
             method : "PATCH",
             entity : "Customers('ALFKI')",
             request : {
