@@ -12,10 +12,15 @@ create an query object which simplify the odata query.
 query template:
 
 `<value>` ：     normally is string value, can be null
+
 `<fieldName>` :  the field name you want to select 
+
 `<Integer>`:     integer value
+
 `<operator>`:    here is the allowed operater `ge`,`le`,`gt`,`lt`,`lt`,`ne`, `eq`
+
 `<format>` :     format value can be `json`, `xml`
+
 `<sortOption>` : sortOption can be `asc`, `desc` 
 
 ```json
@@ -110,8 +115,11 @@ here the steps to genter the odata batch :
 batch request Template :
 
 `<method>` : http method , can be `POST`,  `PATCH`, `DELETE`
+
 `<entity>` : entity name
+
 `<request>`: the request which create new entity or update entity,  if method is `DELETE`, the request can be null
+
 
 
 ```json
